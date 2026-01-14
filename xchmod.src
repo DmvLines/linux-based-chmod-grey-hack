@@ -1,0 +1,207 @@
+// -----------------------------------------------------
+// Linux-style chmod implementation for Grey Hack.
+// Numeric modes (000–777) + recursive (-R) support.
+// Created by Dmv.
+// -----------------------------------------------------
+//
+
+
+// helpers
+str = function(x)
+    if x == null then 
+        return "" 
+    end if
+    return "" + x
+end function
+
+// Converter
+digit_to_perms = function(d)
+    if d == "0" then 
+        return "" 
+    end if
+    if d == "1" then 
+        return "x" 
+    end if
+    if d == "2" then 
+        return "w" 
+    end if
+    if d == "3" then 
+        return "wx" 
+    end if
+    if d == "4" then 
+        return "r" 
+    end if
+    if d == "5" then 
+        return "rx" 
+    end if
+    if d == "6" then 
+        return "rw" 
+    end if
+    if d == "7" then 
+        return "rwx" 
+    end if
+    return null
+end function
+
+// chmod logic
+chmodfunc = function(fileObj, ownDigit, grpDigit, othDigit, recursive)
+    uPerm = digit_to_perms(ownDigit)
+    gPerm = digit_to_perms(grpDigit)
+    oPerm = digit_to_perms(othDigit)
+
+    if uPerm == null or gPerm == null or oPerm == null then
+        return "Mode digits must be 0-7"
+    end if
+
+    // reset perms
+    err = fileObj.chmod("u-rwx", 0)
+    if err != "" then 
+        return err 
+    end if
+    err = fileObj.chmod("g-rwx", 0)
+    if err != "" then 
+        return err 
+    end if
+    err = fileObj.chmod("o-rwx", 0)
+    if err != "" then 
+        return err 
+    end if
+
+    // add perms
+    if uPerm != "" then
+        err = fileObj.chmod("u+" + uPerm, 0)
+        if err != "" then 
+            return err 
+        end if
+    end if
+    if gPerm != "" then
+        err = fileObj.chmod("g+" + gPerm, 0)
+        if err != "" then 
+            return err 
+        end if
+    end if
+    if oPerm != "" then
+        err = fileObj.chmod("o+" + oPerm, 0)
+        if err != "" then 
+            return err 
+        end if
+    end if
+
+    // recursion
+    if recursive == 1 and fileObj.is_folder then
+        items = fileObj.get_files
+        for item in items
+            name = item.name
+            if name == "." or name == ".." then 
+                continue 
+            end if
+
+            err = chmodfunc(item, ownDigit, grpDigit, othDigit, recursive)
+            if err != "" then 
+                return err 
+            end if
+        end for
+    end if
+
+    return ""
+end function
+
+main = function()
+
+    // help text
+    print_help = function()
+        print("")
+        print("Usage: xchmod [-r|-R] <mode> <file>")
+        print("")
+        print("Modes:")
+        print("  000–777   Numeric permission modes (octal)")
+        print("")
+        print("Options:")
+        print("  [-r|-R]         Apply permissions recursively")
+        print("  [-h|--help]      Show this help message")
+        print("  [-n|--numbers]   Shows numeric permissions")
+        print("")
+        print("Examples:")
+        print("  xchmod 755 file.txt")
+        print("  xchmod -R 644 /home/user")
+        print("")
+    end function
+
+    // help numeric
+    print_numbers = function()
+        print("")
+        print("Numeric permission values:")
+        print("")
+        print("  0 = ---  (no permissions)")
+        print("  1 = --x  (execute only)")
+        print("  2 = -w-  (write only)")
+        print("  3 = -wx  (write + execute)")
+        print("  4 = r--  (read only)")
+        print("  5 = r-x  (read + execute)")
+        print("  6 = rw-  (read + write)")
+        print("  7 = rwx  (read + write + execute)")
+        print("")
+        print("Each digit applies to a permission group:")
+        print("")
+        print(" First digit  -> user (Owner)")
+        print(" Second digit -> group")
+        print(" Third digit  -> others")
+        print("")
+    end function
+
+    if params == null or params.len == 0 then
+        print_help()
+        exit("")
+    end if
+
+    // help flags
+    for p in params
+        if p == "-h" or p == "--help" then
+            print_help()
+            exit("")
+        end if
+        if p == "-n" or p == "--numbers" then
+            print_numbers()
+            exit("")
+        end if
+    end for
+
+    recursive = 0
+
+    if params == null then
+        exit("Usage: xchmod [-r|-R] <mode> <file>")
+    end if
+
+    if params.len == 3 and (params[0] == "-r" or params[0] == "-R") then
+        recursive = 1
+        modeStr = params[1]
+        path = params[2]
+    else if params.len == 2 then
+        modeStr = params[0]
+        path = params[1]
+    else
+        exit("Usage: xchmod [-r|-R] <mode> <file>\nUse: -h for more information")
+    end if
+
+    if modeStr.len != 3 then
+        exit("xchmod: mode must be 3 digits (000-777)")
+    end if
+
+    own = modeStr[0]
+    grp = modeStr[1]
+    oth = modeStr[2]
+
+    host = get_shell.host_computer
+    f = host.File(path)
+    if f == null then
+        exit("xchmod: file not found: " + path)
+    end if
+
+    err = chmodfunc(f, own, grp, oth, recursive)
+    if err != "" then
+        exit("xchmod: " + err)
+    end if
+
+end function
+
+main()
