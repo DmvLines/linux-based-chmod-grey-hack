@@ -19,23 +19,17 @@ digit_to_perms = function(d)
         return "" 
     end if
     if d == "1" then 
-        return "x" 
-    end if
+        return "x" end if
     if d == "2" then 
-        return "w" 
-    end if
+        return "w" end if
     if d == "3" then 
-        return "wx" 
-    end if
+        return "wx" end if
     if d == "4" then 
-        return "r" 
-    end if
+        return "r" end if
     if d == "5" then 
-        return "rx" 
-    end if
+        return "rx" end if
     if d == "6" then 
-        return "rw" 
-    end if
+        return "rw" end if
     if d == "7" then 
         return "rwx" 
     end if
@@ -107,7 +101,8 @@ main = function()
     // help text
     print_help = function()
         print("")
-        print("Usage: xchmod [-r|-R] <mode> <file>")
+        print("Usage: xchmod [-R] <mode> <file/folder>")
+        print("       xchmod <file/folder>                (check permissions)")
         print("")
         print("Modes:")
         print("  000–777 ---------- Numeric permission modes (octal)")
@@ -120,6 +115,7 @@ main = function()
         print("Examples:")
         print("  xchmod 755 file.txt")
         print("  xchmod -R 644 /home/user/folder")
+        print("  xchmod /home/user/file")
         print("")
     end function
 
@@ -139,7 +135,7 @@ main = function()
         print("")
         print("Each digit applies to a permission group:")
         print("")
-        print(" First digit  -> user (Owner)")
+        print(" First digit  -> user (owner)")
         print(" Second digit -> group")
         print(" Third digit  -> others")
         print("")
@@ -169,6 +165,23 @@ main = function()
         end if
     end for
 
+    // permission check
+    if params.len == 1 then
+        path = params[0]
+
+        host = get_shell.host_computer
+        f = host.File(path)
+
+        if f == null then
+            exit("File not found")
+        end if
+
+        perms = f.permissions
+        print("")
+        print(path + char(10) + perms)
+        exit("")
+    end if
+
     recursive = 0
 
     if params == null then
@@ -183,7 +196,7 @@ main = function()
         modeStr = params[0]
         path = params[1]
     else
-        exit("Usage: xchmod [-r|-R] <mode> <file>\nUse: -h for more information")
+        exit("Usage: xchmod [-r|-R] <mode> <file>" + char(10) + "Use: -h for more information")
     end if
 
     if modeStr.len != 3 then
