@@ -91,9 +91,6 @@ chmodfunc = function(fileObj, ownDigit, grpDigit, othDigit, recursive)
         items = fileObj.get_files
         for item in items
             name = item.name
-            if name == "." or name == ".." then 
-                continue 
-            end if
 
             err = chmodfunc(item, ownDigit, grpDigit, othDigit, recursive)
             if err != "" then 
@@ -113,16 +110,16 @@ main = function()
         print("Usage: xchmod [-r|-R] <mode> <file>")
         print("")
         print("Modes:")
-        print("  000–777   Numeric permission modes (octal)")
+        print("  000–777 ---------- Numeric permission modes (octal)")
         print("")
         print("Options:")
-        print("  [-r|-R]         Apply permissions recursively")
-        print("  [-h|--help]      Show this help message")
-        print("  [-n|--numbers]   Shows numeric permissions")
+        print("  [-r|-R] ---------- Apply permissions recursively")
+        print("  [-h|--help] ------ Show this help message")
+        print("  [-n|--numbers] --- Shows numeric permissions")
         print("")
         print("Examples:")
         print("  xchmod 755 file.txt")
-        print("  xchmod -R 644 /home/user")
+        print("  xchmod -R 644 /home/user/folder")
         print("")
     end function
 
