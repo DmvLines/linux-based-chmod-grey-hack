@@ -148,6 +148,13 @@ main = function()
         print("")
     end function
 
+    if params.len == 3 and params[2] == "/" then
+        rootChoice = user_input("You are changing the root director are you sure? (Y/N): ")
+        if rootChoice != "y" then
+            exit("")
+        end if
+    end if
+
     if params == null or params.len == 0 then
         print_help()
         exit("")
