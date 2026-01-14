@@ -25,6 +25,6 @@ xchmod -R <mode> <directory>
 
 Each digit applies to a permission group:
 
-First digit  -> user (owner)
-Second digit -> group
-Third digit  -> others
+ First digit  -> user (owner)
+ Second digit -> group
+ Third digit  -> others
