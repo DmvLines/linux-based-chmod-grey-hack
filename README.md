@@ -11,8 +11,8 @@ This script supports:
 ## Usage
 
 ```bash
-xchmod <mode> <file>
-xchmod -R <mode> <directory>
+xchmod <mode> <file/folder>
+xchmod -R <mode> <directory/folder>
 ```
 - 0 = ---  (no permissions)
 - 1 = --x  (execute only)
