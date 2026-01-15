@@ -141,12 +141,13 @@ main = function()
         print("")
     end function
 
-    if params.len == 3 and params[2] == "/" then
-        rootChoice = user_input("You are changing the root director are you sure? (Y/N): ")
-        if rootChoice != "y" then
-            exit("")
-        end if
-    end if
+    // root folder check
+    if params.len == 3 and params[2] == "/" then                                            // get rid of if you don't want root folder check enabled
+        rootChoice = user_input("You are changing the root director are you sure? (Y/N): ") // get rid of if you don't want root folder check enabled
+        if rootChoice != "y" then                                                           // get rid of if you don't want root folder check enabled
+            exit("")                                                                        // get rid of if you don't want root folder check enabled
+        end if                                                                              // get rid of if you don't want root folder check enabled
+    end if                                                                                  // get rid of if you don't want root folder check enabled
 
     if params == null or params.len == 0 then
         print_help()
