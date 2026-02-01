@@ -101,6 +101,7 @@ main = function()
     // help text
     print_help = function()
         print("")
+        print("----------------------------------------------------------------")
         print("Usage: xchmod [-R] <mode> <file/folder>")
         print("       xchmod <file/folder>                (check permissions)")
         print("")
@@ -109,6 +110,7 @@ main = function()
         print("")
         print("Options:")
         print("  [-r|-R] ---------- Apply permissions recursively")
+        print("  [-c|-C]----------- Create folder")
         print("  [-h|--help] ------ Show this help message")
         print("  [-n|--numbers] --- Shows numeric permissions")
         print("")
@@ -116,12 +118,14 @@ main = function()
         print("  xchmod 755 file.txt")
         print("  xchmod -R 644 /home/user/folder")
         print("  xchmod /home/user/file")
+        print("----------------------------------------------------------------")
         print("")
     end function
 
     // help numeric
     print_numbers = function()
         print("")
+        print("----------------------------------------------")
         print("Numeric permission values:")
         print("")
         print("  0 = ---  (no permissions)")
@@ -138,6 +142,7 @@ main = function()
         print(" First digit  -> user (owner)")
         print(" Second digit -> group")
         print(" Third digit  -> others")
+        ("----------------------------------------------")
         print("")
     end function
 
@@ -165,6 +170,21 @@ main = function()
             exit("")
         end if
     end for
+
+    // create folder
+    if params.len >= 1 and (params[0] == "-c" or params[0] == "-C") then
+        host = get_shell.host_computer
+
+        if params.len != 3 then
+            exit("Usage: xchmod [-c|-C] <name> <path>")
+        end if
+
+        nameFolder = params[1]
+        path = params[2]
+        host.create_folder(path, nameFolder)
+        print("Folder " + "<b><color=#00FF00>" + nameFolder + "</b></color>" + " created at: " + path)
+        exit
+    end if
 
     // permission check
     if params.len == 1 then
